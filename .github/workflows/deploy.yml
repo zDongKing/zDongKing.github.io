@@ -5,6 +5,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# 强制使用Node.js 24，解决GitHub 2026年6月强制升级问题
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  HUGO_VERSION: "0.161.0"  # 模板要求的最低版本
+  NODE_VERSION: 24
+
 permissions:
   contents: read
   pages: write
@@ -17,11 +23,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      HUGO_VERSION: "0.161.0"  # 模板要求的最低版本
-      NODE_VERSION: 24
-      PNPM_VERSION: 9
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,7 +38,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
+          # 去掉version字段，自动使用package.json里指定的版本
           run_install: true
 
       - name: Setup Hugo
