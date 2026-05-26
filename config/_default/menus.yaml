@@ -1,20 +1,10 @@
 main:
   - name: 首页
     url: /
-    weight: 10  # 数字越小，越排在左边
-
-  - name: 关于我
-    url: /about/
+    weight: 10
+  - name: 技术博客
+    url: /blog/
     weight: 20
-
   - name: 项目经历
     url: /projects/
     weight: 30
-
-  - name: 技术博客
-    url: /posts/
-    weight: 40
-
-  - name: 个人简历
-    url: /cv/
-    weight: 50
