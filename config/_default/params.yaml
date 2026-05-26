@@ -92,6 +92,7 @@ hugoblox:
     theme_toggle: true
     theme_picker: true
     language_switcher: true
+    logo: { text: "张东" }  # 只加这一行！
     # Call-to-action button
     cta:
       enable: false
