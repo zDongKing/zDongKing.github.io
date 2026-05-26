@@ -7,7 +7,7 @@ name:
   display: 张东
   given: 东
   family: 张
-  avatar: "/media/avatar.jpg"  # 加上这一行！
+  image: "media/avatar.jpg"  # 正确的字段名是image！
 role: 数据科学与大数据技术本科生
 status:
   icon: 🎓
