@@ -1,10 +1,8 @@
 ---
 title: "我的第一篇技术博客"
 date: 2026-05-26T23:59:00+08:00
-draft: false  # 必须设为false才会发布
+draft: false
 tags: ["C++", "算法", "学习笔记"]
-categories: ["技术分享"]
-author: "张东"
 ---
 
 # 我的第一篇技术博客
