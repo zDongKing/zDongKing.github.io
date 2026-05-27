@@ -6,7 +6,7 @@ description: "这是我用GitHub Pages搭建的个人博客的第一篇文章，
 
 # 封面图片配置
 image:
-  filename: "my-first-blog-cover.jpg"  # 相对于assets/media/的文件名
+  filename: "my-first-blog-cover.png"  # 相对于assets/media/的文件名
   placement: 1  # 1=全宽，2=外凸，3=全屏
   focal_point: "Center"  # 裁剪焦点
   preview_only: false  # 是否只在列表页显示，不在文章详情页显示
