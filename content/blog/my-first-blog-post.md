@@ -2,7 +2,15 @@
 title: "我的第一篇技术博客"
 date: 2026-05-26T23:59:00+08:00
 draft: false
-tags: ["C++", "算法", "学习笔记"]
+description: "这是我用GitHub Pages搭建的个人博客的第一篇文章，记录了我搭建博客的过程和遇到的问题。"
+
+# 封面图片配置
+image:
+  filename: "my-first-blog-cover.jpg"  # 相对于assets/media/的文件名
+  placement: 1  # 1=全宽，2=外凸，3=全屏
+  focal_point: "Center"  # 裁剪焦点
+  preview_only: false  # 是否只在列表页显示，不在文章详情页显示
+  alt_text: "我的第一篇技术博客封面"
 ---
 
 # 我的第一篇技术博客
