@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>执法记录仪系统 | 张东项目作品集</title>
+  <meta name="description" content="Qt + FFmpeg 执法记录仪客户端项目介绍。">
+  <style>
+    :root { --bg:#f6f7fb; --panel:#fff; --text:#172033; --muted:#5c667a; --line:#dde3ee; --brand:#1769e0; --accent:#16a085; --code:#101828; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+    a { color:var(--brand); text-decoration:none; }
+    .wrap { width:min(980px, calc(100% - 40px)); margin:0 auto; }
+    header { background:linear-gradient(135deg,#101828,#0f766e); color:#fff; padding:44px 0; }
+    .back { display:inline-block; margin-bottom:18px; color:#bef4eb; font-weight:600; }
+    h1 { margin:0; font-size:clamp(30px,5vw,48px); line-height:1.15; letter-spacing:0; }
+    .lead { max-width:760px; margin:14px 0 0; color:#def7f2; font-size:17px; }
+    main { padding:32px 0 52px; }
+    section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:24px; margin-bottom:18px; box-shadow:0 10px 24px rgba(16,24,40,.05); }
+    h2 { margin:0 0 14px; font-size:24px; line-height:1.3; }
+    p { margin:0 0 12px; color:var(--muted); }
+    ul { margin:0; padding-left:20px; color:var(--muted); }
+    li + li { margin-top:8px; }
+    .chips { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+    .chip { border:1px solid #bfe7df; background:#ecfbf8; color:#0f766e; border-radius:999px; padding:5px 11px; font-size:14px; font-weight:600; }
+    .flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .node { min-height:92px; border:1px solid var(--line); border-radius:8px; padding:14px; background:#fbfcff; }
+    .node strong { display:block; margin-bottom:6px; color:var(--text); }
+    .node span { display:block; color:var(--muted); font-size:14px; }
+    code { color:#0f766e; background:#ecfbf8; padding:2px 5px; border-radius:4px; font-family:Consolas,"Courier New",monospace; font-size:.95em; }
+    pre { overflow:auto; margin:12px 0 0; padding:16px; color:#eef4ff; background:var(--code); border-radius:8px; line-height:1.55; }
+    pre code { color:inherit; background:transparent; padding:0; }
+    .truth { border-left:4px solid var(--accent); background:#effaf7; }
+    @media (max-width:820px) { .flow { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回作品集首页</a>
+      <h1>执法记录仪系统</h1>
+      <p class="lead">一个 Qt + FFmpeg 客户端项目，重点体现摄像头采集、实时预览、H.264 录像、本地回放、SQLite 数据管理与 MVC 分层组织能力。</p>
+      <div class="chips"><span class="chip">C++</span><span class="chip">Qt Widgets</span><span class="chip">QThread</span><span class="chip">FFmpeg</span><span class="chip">DirectShow</span><span class="chip">H.264</span><span class="chip">SQLite</span><span class="chip">MVC</span></div>
+    </div>
+  </header>
+  <main>
+    <div class="wrap">
+      <section>
+        <h2>项目概述</h2>
+        <p>项目面向执法记录仪场景，实现摄像头采集、实时预览、录像、抓拍、视频查询、本地回放和日志查看等功能。视频处理逻辑封装在线程中，主界面通过 Qt 信号槽接收图像帧，避免采集、编码和文件处理阻塞界面交互。</p>
+        <div class="flow" aria-label="视频处理链路">
+          <div class="node"><strong>摄像头采集</strong><span>FFmpeg DirectShow 打开本机摄像头</span></div>
+          <div class="node"><strong>帧处理</strong><span>解码为 RGB32 预览，并转换为 YUV420P</span></div>
+          <div class="node"><strong>录像写入</strong><span>H.264 编码，按帧数切分文件</span></div>
+          <div class="node"><strong>本地管理</strong><span>SQLite 元数据、查询、回放与导出</span></div>
+        </div>
+      </section>
+      <section>
+        <h2>核心实现</h2>
+        <ul>
+          <li>封装 <code>VideoProcessingThread</code>，通过 FFmpeg <code>dshow</code> 输入设备采集摄像头流，循环读取视频帧并发送到界面显示。</li>
+          <li>将解码后的帧转换为 <code>RGB32</code> 用于 Qt 实时预览，同时转换为 <code>YUV420P</code> 交给 H.264 编码模块写入录像。</li>
+          <li>录像过程按 1500 帧进行自动切分，保存首帧封面并将视频路径、时间等元数据写入 SQLite，便于后续分页查询和回放。</li>
+          <li>使用独立播放线程解码本地录像，支持播放、暂停和三档速度切换，降低长时间视频处理对主界面的影响。</li>
+        </ul>
+      </section>
+      <section>
+        <h2>MVC 分层</h2>
+        <p>项目目录中包含 <code>View</code>、<code>Controller</code> 和 <code>model</code> 结构。界面层负责用户交互和展示，Controller 层负责业务调用，model 层封装用户数据与数据库访问，<code>SingletonDB</code> 用于管理 SQLite 连接。</p>
+        <pre><code>View         // Qt 页面与控件交互
+Controller   // 用户、查询等业务控制逻辑
+model        // 数据模型与 SQLite 访问
+SingletonDB  // 本地数据库连接管理</code></pre>
+      </section>
+      <section id="interview">
+        <h2>面试讲法</h2>
+        <ul>
+          <li>我把摄像头采集和编码放到 QThread 中处理，界面只负责接收信号并刷新预览，避免主线程卡顿。</li>
+          <li>FFmpeg 采集链路里，输入端使用 DirectShow，显示端转 RGB32，编码端转 YUV420P，这样能同时满足预览和录像。</li>
+          <li>录像不是一个文件无限写，而是按固定帧数切分，并把路径和封面信息写入 SQLite，便于列表查询和回放管理。</li>
+          <li>项目按 View、Controller、model 分层组织，能把界面逻辑、业务控制和数据库访问拆开，后续维护更清晰。</li>
+        </ul>
+      </section>
+      <section class="truth">
+        <h2>源码事实边界</h2>
+        <p>项目中的 MP4/AVI 处理更适合描述为“封装导出”或“容器转换”，不要夸成完整转码系统。真正的强点是摄像头采集、帧格式转换、H.264 录像、多线程预览和 SQLite 本地管理。</p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

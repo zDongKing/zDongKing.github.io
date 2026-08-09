@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>智慧停车系统 | 张东项目作品集</title>
+  <meta name="description" content="智慧停车系统 Linux C++ 服务端项目介绍。">
+  <style>
+    :root { --bg:#f6f7fb; --panel:#fff; --text:#172033; --muted:#5c667a; --line:#dde3ee; --brand:#1769e0; --accent:#16a085; --code:#101828; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",Arial,sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+    a { color:var(--brand); text-decoration:none; }
+    .wrap { width:min(980px, calc(100% - 40px)); margin:0 auto; }
+    header { background:linear-gradient(135deg,#101828,#174ea6); color:#fff; padding:44px 0; }
+    .back { display:inline-block; margin-bottom:18px; color:#bdd7ff; font-weight:600; }
+    h1 { margin:0; font-size:clamp(30px,5vw,48px); line-height:1.15; letter-spacing:0; }
+    .lead { max-width:760px; margin:14px 0 0; color:#dce7f8; font-size:17px; }
+    main { padding:32px 0 52px; }
+    section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:24px; margin-bottom:18px; box-shadow:0 10px 24px rgba(16,24,40,.05); }
+    h2 { margin:0 0 14px; font-size:24px; line-height:1.3; }
+    p { margin:0 0 12px; color:var(--muted); }
+    ul { margin:0; padding-left:20px; color:var(--muted); }
+    li + li { margin-top:8px; }
+    .chips { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+    .chip { border:1px solid #cfe0ff; background:#eef6ff; color:#174ea6; border-radius:999px; padding:5px 11px; font-size:14px; font-weight:600; }
+    .flow { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:14px; }
+    .node { min-height:92px; border:1px solid var(--line); border-radius:8px; padding:14px; background:#fbfcff; }
+    .node strong { display:block; margin-bottom:6px; color:var(--text); }
+    .node span { display:block; color:var(--muted); font-size:14px; }
+    code { color:#0f4fae; background:#eef4ff; padding:2px 5px; border-radius:4px; font-family:Consolas,"Courier New",monospace; font-size:.95em; }
+    pre { overflow:auto; margin:12px 0 0; padding:16px; color:#eef4ff; background:var(--code); border-radius:8px; line-height:1.55; }
+    pre code { color:inherit; background:transparent; padding:0; }
+    .truth { border-left:4px solid var(--accent); background:#effaf7; }
+    @media (max-width:820px) { .flow { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <a class="back" href="../index.html">← 返回作品集首页</a>
+      <h1>智慧停车系统</h1>
+      <p class="lead">一个 Linux C++ 服务端项目，重点体现网络接入、业务任务分发、进程通信、数据库操作与应用层文件分片传输能力。</p>
+      <div class="chips"><span class="chip">Linux</span><span class="chip">C++</span><span class="chip">Socket</span><span class="chip">epoll</span><span class="chip">pthread</span><span class="chip">MySQL</span><span class="chip">共享内存</span><span class="chip">消息队列</span><span class="chip">信号量</span></div>
+    </div>
+  </header>
+  <main>
+    <div class="wrap">
+      <section>
+        <h2>项目概述</h2>
+        <p>项目采用前置网络服务与后置业务服务的双进程结构。前置服务负责 TCP 连接接入、协议头解析、客户端连接标识维护和响应回写；后置服务负责业务任务分发、数据库读写和文件传输处理。两个进程之间通过共享内存、消息队列和信号量传递请求与响应数据。</p>
+        <div class="flow" aria-label="系统链路">
+          <div class="node"><strong>客户端请求</strong><span>登录、车辆进出、查询、文件上传、心跳等</span></div>
+          <div class="node"><strong>前置服务</strong><span>Socket 接入、epoll 监听、协议解析</span></div>
+          <div class="node"><strong>IPC 通道</strong><span>共享内存、消息队列、信号量</span></div>
+          <div class="node"><strong>后置服务</strong><span>任务工厂分发、MySQL 读写、响应返回</span></div>
+        </div>
+      </section>
+      <section>
+        <h2>核心实现</h2>
+        <ul>
+          <li>前置服务基于 <code>Socket + epoll</code> 处理 TCP 连接，将请求按 <code>service_type + data_len + body</code> 的格式解析并写入共享内存。</li>
+          <li>后置服务通过任务工厂分发登录、验证码、注册、车辆进出、车辆查询、视频保存、目录查询、记录查询、文件传输、心跳等业务任务。</li>
+          <li>通过 <code>pthread</code> 线程处理响应回写与超时检查，心跳链路用于维护客户端在线状态。</li>
+          <li>业务数据通过 MySQL 写入和查询，覆盖用户、车辆、出入记录、视频目录与文件传输结果等信息。</li>
+        </ul>
+      </section>
+      <section>
+        <h2>文件分片传输</h2>
+        <p>文件传输模块是项目中最适合展开讲的亮点。每个文件片段携带分片序号、总分片数、分片大小和文件大小等字段，服务端使用 map 缓存分片并自动覆盖重复序号。收到结束信号或最后一个分片后，服务端遍历检查缺失分片，缺片则返回缺失序号；完整则按序写入文件完成重组。</p>
+        <pre><code>fragmentation_index   // 当前分片序号
+fragmentation_total   // 总分片数量
+fragmentation_size    // 当前分片大小
+file_size             // 文件总大小
+fragmentation_data    // 当前分片内容</code></pre>
+      </section>
+      <section id="interview">
+        <h2>面试讲法</h2>
+        <ul>
+          <li>我主要负责服务端通信链路和业务任务联调，前置进程负责网络收发，后置进程负责业务处理，中间用 IPC 解耦。</li>
+          <li>协议层没有只传 JSON，而是定义了固定协议头，包含业务类型和数据长度，后面接不同业务结构体。</li>
+          <li>文件传输不是一次性发送大文件，而是应用层分片，每片都有序号和总片数，服务端能检测缺片并反馈需要补传的分片。</li>
+          <li>如果被追问 TCP 粘包半包，可以说项目里主要做了定长协议头和业务体格式设计，完整的循环读包和连接级缓存还有继续优化空间。</li>
+        </ul>
+      </section>
+      <section class="truth">
+        <h2>源码事实边界</h2>
+        <p>源码中定义了 13 个协议类型编号，但任务工厂实际分发的是 11 类业务请求。项目页面采用“业务任务分发”和“文件分片完整性校验”的表述，避免夸大成生产级完整 TCP 拆包框架。</p>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
