@@ -1,0 +1,10 @@
+main:
+  - name: 首页
+    url: /
+    weight: 10
+  - name: 技术博客
+    url: /blog/
+    weight: 20
+  - name: 项目经历
+    url: /projects/
+    weight: 30
